@@ -1,0 +1,16 @@
+# Local agent governance (kept out of the public repository)
+.claude/
+
+# Raw data is never committed
+data/raw/
+
+# Python
+.venv/
+__pycache__/
+
+# OS
+.DS_Store
+
+# Local planning files and secrets
+KICKOFF*
+.env*
