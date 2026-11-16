@@ -1,6 +1,5 @@
 // Brasa Orbit — daily MODIS vs VIIRS S-NPP calendar.
-// Written with the help of an AI coding assistant (Claude) during the
-// NASA Space Apps Challenge 2026 hackathon window; reviewed by the team.
+// Built during the NASA Space Apps Challenge 2026 hackathon window.
 (function () {
   "use strict";
 

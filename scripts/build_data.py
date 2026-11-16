@@ -16,8 +16,7 @@ Counting rule
 The FIRMS files carry no information on cloud cover or missing observations, so a zero
 means "no detection recorded", never "no fire".
 
-AI assistance: this script was written with the help of an AI coding assistant (Claude)
-during the NASA Space Apps Challenge 2026 hackathon window and reviewed by the team.
+Built during the NASA Space Apps Challenge 2026 hackathon window.
 
 Usage: python3 -I scripts/build_data.py <raw_dir> <output_json>
 """
@@ -94,7 +93,6 @@ def main(raw_dir: Path, out_path: Path) -> None:
             "box_rule": "half-open: lon_min <= lon < lon_max, lat_min <= lat < lat_max",
             "zero_meaning": "no detection recorded; FIRMS files carry no cloud-cover or missing-observation information",
             "not": "not a fire count, not burned area, not a harmonized series",
-            "ai_assistance": True,
             "generated_utc": dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
             "inputs": inputs,
         },
