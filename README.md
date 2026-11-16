@@ -8,8 +8,8 @@ Challenge: *Harmonization of MODIS and VIIRS Hot Spots*
 
 Built during the NASA Space Apps Challenge 2026 hackathon window (14–15 Nov 2026).
 
-- Calendar app: TODO(link)
-- Slides: TODO(link)
+- Calendar app: https://hemertonsilva.github.io/brasa-orbit-spaceapps-2026/
+- Slides: https://hemertonsilva.github.io/brasa-orbit-spaceapps-2026/slides/
 
 ## Overview
 
@@ -23,7 +23,7 @@ Two widely used services show the split: INPE uses a single "reference satellite
 
 - Daily counts of FIRMS detections for MODIS and VIIRS S-NPP, side by side, for 2018–2020, browsable by day, month and year.
 - A region selector:
-  - **R1 — western Mato Grosso, Brazil:** lon [−56, −52) × lat [−17, −10).
+  - **R1 — central-eastern Mato Grosso, Brazil:** lon [−56, −52) × lat [−17, −10).
   - **R2 — MATOPIBA, Brazil (comparison):** lon [−47, −43) × lat [−12, −5).
   - Boxes are half-open: a detection at exactly lon −52 is not in R1.
 - A VIIRS/MODIS ratio labelled **"naive diagnostic, not harmonization"**.
@@ -42,7 +42,7 @@ Two widely used services show the split: INPE uses a single "reference satellite
 
 Detections with `type == 0`, day and night, dates in UTC. Both regions peak in September in all three years.
 
-In R1, VIIRS records about 3.2–3.6 times as many detections as MODIS over a year. From February to April the order flips and MODIS records more than VIIRS:
+In R1, over a full year, VIIRS records 3.2–3.6× as many detections as MODIS. Yet in 9 months MODIS records clearly more than VIIRS (ratio below 0.8: February–April of 2018, 2019 and 2020):
 
 | R1 monthly VIIRS/MODIS | Feb | Mar | Apr |
 | --- | ---: | ---: | ---: |
@@ -50,7 +50,7 @@ In R1, VIIRS records about 3.2–3.6 times as many detections as MODIS over a ye
 | 2019 | 0.70 | 0.21 | 0.43 |
 | 2020 | 0.39 | 0.22 | 0.62 |
 
-The ratio between the two records changes with the season, so no single scaling factor turns one record into the other. The difference depends on how each sensor observes, not only on fire activity.
+The ratio between the two records changes with the season, so no single scaling factor turns one record into the other. Pixel size, overpass time and the number of satellites can all produce gaps like these; this view shows them but does not correct for them.
 
 ## Data (NASA FIRMS)
 

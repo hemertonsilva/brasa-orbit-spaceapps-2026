@@ -1,0 +1,299 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Brasa Orbit — Slides</title>
+<meta name="description" content="Brasa Orbit: MODIS and VIIRS active-fire detections side by side in one calendar. NASA Space Apps Challenge 2026, Team Brasa Orbital.">
+<style>
+  :root {
+    --page: #12110f;
+    --surface: #1c1b18;
+    --line: #34322d;
+    --text: #f0efec;
+    --text-2: #c3c2b7;
+    --muted: #a3a198;
+    --ember: #f08a3c;
+    --modis: #e8913a;
+    --viirs: #6da7ec;
+    --parity: #f0efec;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-snap-type: y proximity; scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--page);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    line-height: 1.45;
+    -webkit-font-smoothing: antialiased;
+  }
+  .slide {
+    position: relative;
+    min-height: 100vh;
+    scroll-snap-align: start;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: clamp(28px, 6vh, 72px) clamp(16px, 7vw, 120px) clamp(56px, 9vh, 88px);
+    border-bottom: 1px solid var(--line);
+  }
+  .inner { width: 100%; max-width: 1100px; margin: 0 auto; }
+  .kicker {
+    font-size: clamp(12px, 1.4vw, 15px);
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--ember);
+    margin: 0 0 14px;
+    font-weight: 600;
+  }
+  h1 { font-size: clamp(44px, 8vw, 104px); line-height: 1; margin: 0 0 18px; letter-spacing: -.02em; }
+  h2 { font-size: clamp(28px, 4.2vw, 52px); line-height: 1.1; margin: 0 0 24px; letter-spacing: -.01em; }
+  p, li { font-size: clamp(16px, 2vw, 22px); color: var(--text-2); }
+  .lead { font-size: clamp(19px, 2.6vw, 30px); color: var(--text); max-width: 34ch; margin: 0 0 28px; }
+  ul { margin: 0; padding-left: 1.1em; }
+  li { margin: 0 0 10px; }
+  li::marker { color: var(--ember); }
+  strong { color: var(--text); }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .9em; color: var(--text); }
+  a { color: var(--viirs); }
+  .meta { color: var(--muted); font-size: clamp(14px, 1.6vw, 18px); margin: 4px 0; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(20px, 4vw, 56px); align-items: start; }
+  .grid2 > * { min-width: 0; }
+  .kicker, p, li { overflow-wrap: break-word; }
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: clamp(16px, 2.4vw, 28px); }
+  .card h3 { margin: 0 0 10px; font-size: clamp(17px, 2vw, 22px); }
+  .sw { display: inline-block; width: .8em; height: .8em; border-radius: 2px; vertical-align: -.05em; margin-right: .35em; }
+  .sw.modis { background: var(--modis); }
+  .sw.viirs { background: var(--viirs); }
+
+  /* slide 3 screenshot */
+  .shot { width: 100%; border: 1px solid var(--line); border-radius: 10px; display: block; background: var(--surface); }
+  .shot-missing[hidden], .shot[hidden] { display: none; }
+  .shot-missing {
+    aspect-ratio: 16 / 10; display: flex; align-items: center; justify-content: center; text-align: center;
+    border: 1px dashed var(--line); border-radius: 10px; color: var(--muted); padding: 16px; font-size: 16px;
+  }
+
+  /* slide 4 finding */
+  .big { font-size: clamp(56px, 10vw, 128px); font-weight: 700; line-height: 1; color: var(--viirs); letter-spacing: -.03em; }
+  .big.modis { color: var(--modis); }
+  .bigcap { color: var(--text-2); font-size: clamp(15px, 1.8vw, 20px); margin: 8px 0 0; max-width: 28ch; }
+  .bars { display: grid; grid-template-columns: auto 1fr; gap: 6px 12px; align-items: center; font-size: clamp(13px, 1.5vw, 16px); }
+  .bars .lab { color: var(--muted); white-space: nowrap; }
+  .track { position: relative; height: 18px; }
+  .track::after {
+    content: ""; position: absolute; top: -3px; bottom: -3px; left: 25%; border-left: 2px dashed var(--parity); opacity: .55;
+  }
+  .bar { height: 100%; width: calc(var(--v) / 4 * 100%); border-radius: 3px; background: var(--viirs); display: flex; align-items: center; }
+  .bar.low { background: var(--modis); }
+  .bar span { position: relative; left: calc(100% + 6px); color: var(--text); white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .bars .sep { grid-column: 1 / -1; height: 6px; }
+  .legend { color: var(--muted); font-size: clamp(13px, 1.4vw, 15px); margin-top: 14px; }
+
+  /* slide 6 formula */
+  .formula {
+    font-family: "Cambria Math", "STIX Two Math", Georgia, serif;
+    font-size: clamp(26px, 4.4vw, 52px); color: var(--text); margin: 6px 0 18px;
+  }
+  .formula small { font-size: .55em; color: var(--muted); font-family: inherit; }
+
+  .foot {
+    position: absolute; left: clamp(16px, 7vw, 120px); right: clamp(16px, 7vw, 120px); bottom: clamp(16px, 3vh, 28px);
+    display: flex; justify-content: space-between; color: var(--muted); font-size: 13px;
+  }
+  .hint { color: var(--muted); font-size: 13px; margin-top: 28px; }
+
+  @media (max-width: 760px) {
+    .grid2 { grid-template-columns: 1fr; }
+    html { scroll-snap-type: none; }
+  }
+  @media print {
+    @page { size: landscape; margin: 0; }
+    html { scroll-snap-type: none; }
+    body { background: var(--page); -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .slide { min-height: 100vh; page-break-after: always; break-after: page; border: 0; }
+    .hint { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- 1. Title -->
+<section class="slide" id="s1" aria-label="Slide 1 of 7: title">
+  <div class="inner">
+    <p class="kicker">NASA Space Apps Challenge 2026 · Harmonization of MODIS and VIIRS Hot Spots</p>
+    <h1>Brasa Orbit</h1>
+    <p class="lead">MODIS and VIIRS active-fire detections, side by side, in one calendar.</p>
+    <p class="meta"><strong>Hemerton Silva</strong> (hemertonsilva) · Team Brasa Orbital</p>
+    <p class="meta">Santa Cruz das Palmeiras Local Event (virtual) · 14–15 Nov 2026</p>
+    <p class="meta"><a href="../">Open the calendar</a></p>
+    <p class="hint">Use ↓ / → or scroll to move between slides.</p>
+  </div>
+  <div class="foot"><span></span><span>1 / 7</span></div>
+</section>
+
+<!-- 2. Problem -->
+<section class="slide" id="s2" aria-label="Slide 2 of 7: problem">
+  <div class="inner">
+    <p class="kicker">The problem</p>
+    <h2>One fire record, split between two sensors</h2>
+    <div class="grid2">
+      <div class="card">
+        <h3><span class="sw modis"></span>MODIS</h3>
+        <p>About 1 km pixels.</p>
+      </div>
+      <div class="card">
+        <h3><span class="sw viirs"></span>VIIRS (Suomi NPP)</h3>
+        <p>375 m pixels. Production ceased at 15:40 UTC on 2 Nov 2026 (FIRMS FAQ).</p>
+      </div>
+    </div>
+    <ul style="margin-top:28px">
+      <li>The counts are not interchangeable. Switching sensors can look like a change on the ground.</li>
+      <li>Two widely used services show the split: INPE uses a single reference satellite (Aqua since 22 Aug 2011), and GWIS shows VIIRS and MODIS anomalies separately.</li>
+    </ul>
+  </div>
+  <div class="foot"><span>© 2026 Hemerton Silva</span><span>2 / 7</span></div>
+</section>
+
+<!-- 3. What we built -->
+<section class="slide" id="s3" aria-label="Slide 3 of 7: what we built">
+  <div class="inner">
+    <p class="kicker">What we built</p>
+    <h2>A day × month × year calendar with both sensors</h2>
+    <div class="grid2">
+      <div>
+        <img class="shot" src="screenshot.png" alt="Brasa Orbit calendar showing daily MODIS and VIIRS detection counts side by side"
+             onerror="this.hidden=true; this.nextElementSibling.hidden=false;">
+        <div class="shot-missing" hidden>Screenshot of the calendar app</div>
+      </div>
+      <ul>
+        <li><span class="sw modis"></span>MODIS and <span class="sw viirs"></span>VIIRS daily counts, side by side, 2018–2020.</li>
+        <li>Region selector: <strong>R1</strong> central-eastern Mato Grosso and <strong>R2</strong> MATOPIBA, Brazil.</li>
+        <li>Monthly VIIRS/MODIS ratio, labelled <strong>“naive diagnostic, not harmonization”</strong>.</li>
+        <li>Legend: <strong>“no detection recorded ≠ no fire”</strong>.</li>
+        <li>Static web page; no login.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot"><span>© 2026 Hemerton Silva</span><span>3 / 7</span></div>
+</section>
+
+<!-- 4. Finding -->
+<section class="slide" id="s4" aria-label="Slide 4 of 7: finding">
+  <div class="inner">
+    <p class="kicker">What the calendar reveals · R1, central-eastern Mato Grosso</p>
+    <h2>The gap between sensors changes with the season</h2>
+    <div class="grid2">
+      <div>
+        <div class="big">3.2–3.6×</div>
+        <p class="bigcap">as many VIIRS as MODIS detections over a full year (2018–2020)</p>
+        <div style="height:28px"></div>
+        <div class="big modis">9 months</div>
+        <p class="bigcap">where MODIS records clearly more than VIIRS (ratio below 0.8): February–April of 2018, 2019 and 2020</p>
+      </div>
+      <div class="card">
+        <div class="bars" role="img" aria-label="VIIRS/MODIS ratio. Annual: 3.18, 3.33, 3.57. February to April, all below 1: 2018 0.58, 0.50, 0.35; 2019 0.70, 0.21, 0.43; 2020 0.39, 0.22, 0.62.">
+          <span class="lab">2018 year</span><div class="track"><div class="bar" style="--v:3.18"><span>3.18</span></div></div>
+          <span class="lab">Feb</span><div class="track"><div class="bar low" style="--v:0.58"><span>0.58</span></div></div>
+          <span class="lab">Mar</span><div class="track"><div class="bar low" style="--v:0.50"><span>0.50</span></div></div>
+          <span class="lab">Apr</span><div class="track"><div class="bar low" style="--v:0.35"><span>0.35</span></div></div>
+          <span class="sep"></span>
+          <span class="lab">2019 year</span><div class="track"><div class="bar" style="--v:3.33"><span>3.33</span></div></div>
+          <span class="lab">Feb</span><div class="track"><div class="bar low" style="--v:0.70"><span>0.70</span></div></div>
+          <span class="lab">Mar</span><div class="track"><div class="bar low" style="--v:0.21"><span>0.21</span></div></div>
+          <span class="lab">Apr</span><div class="track"><div class="bar low" style="--v:0.43"><span>0.43</span></div></div>
+          <span class="sep"></span>
+          <span class="lab">2020 year</span><div class="track"><div class="bar" style="--v:3.57"><span>3.57</span></div></div>
+          <span class="lab">Feb</span><div class="track"><div class="bar low" style="--v:0.39"><span>0.39</span></div></div>
+          <span class="lab">Mar</span><div class="track"><div class="bar low" style="--v:0.22"><span>0.22</span></div></div>
+          <span class="lab">Apr</span><div class="track"><div class="bar low" style="--v:0.62"><span>0.62</span></div></div>
+        </div>
+        <p class="legend">VIIRS/MODIS ratio of detection counts. Dashed line = 1 (equal counts). Naive diagnostic, not harmonization.</p>
+      </div>
+    </div>
+    <p style="margin-top:24px">No single scaling factor turns one record into the other. Pixel size, overpass time and the number of satellites can all produce gaps like these; this view shows them but does not correct for them.</p>
+  </div>
+  <div class="foot"><span>© 2026 Hemerton Silva</span><span>4 / 7</span></div>
+</section>
+
+<!-- 5. NASA data -->
+<section class="slide" id="s5" aria-label="Slide 5 of 7: NASA data">
+  <div class="inner">
+    <p class="kicker">NASA data</p>
+    <h2>NASA FIRMS, standard yearly country files</h2>
+    <div class="grid2">
+      <ul>
+        <li>Brazil, 2018–2020. <strong>MODIS version 6.03</strong> and <strong>VIIRS S-NPP version 2</strong>, as labelled in the files.</li>
+        <li>Kept <code>type == 0</code> (presumed vegetation fire), day and night, dates in UTC.</li>
+        <li>Half-open boxes: R1 lon [−56, −52) × lat [−17, −10); R2 lon [−47, −43) × lat [−12, −5).</li>
+        <li>Raw files are not redistributed; checksums are recorded with the aggregated data.</li>
+      </ul>
+      <div class="card">
+        <p style="margin-top:0">We acknowledge the use of imagery from the NASA LANCE FIRMS (<a href="https://www.earthdata.nasa.gov/data/tools/firms">earthdata.nasa.gov/data/tools/firms</a>).</p>
+        <p class="meta" style="margin-bottom:0">Data accessed on 15 Nov 2026.</p>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>© 2026 Hemerton Silva</span><span>5 / 7</span></div>
+</section>
+
+<!-- 6. Method and next step -->
+<section class="slide" id="s6" aria-label="Slide 6 of 7: method and next step">
+  <div class="inner">
+    <p class="kicker">Method and next step</p>
+    <h2>From raw counts to a rate per observed area</h2>
+    <div class="formula">Y = 1000 · ΣD / E &nbsp;<small>with E = Σ A<sub style="font-size:.7em">p</sub> &gt; 0</small></div>
+    <ul>
+      <li><strong>D</strong>: detections counted on the area both sensors could observe at each comparable overpass <em>p</em>.</li>
+      <li><strong>E</strong>: exposure, the usable observed area summed over overpasses (km² × overpass).</li>
+      <li>An observed zero (Y = 0) and a missing rate (E = 0) are different results.</li>
+      <li>Needs cloud and coverage information that the FIRMS files do not provide. Described as method; not computed in this submission.</li>
+    </ul>
+  </div>
+  <div class="foot"><span>© 2026 Hemerton Silva</span><span>6 / 7</span></div>
+</section>
+
+<!-- 7. Limits -->
+<section class="slide" id="s7" aria-label="Slide 7 of 7: limits">
+  <div class="inner">
+    <p class="kicker">Limits</p>
+    <h2>What this calendar does not claim</h2>
+    <ul>
+      <li><strong>Not harmonized.</strong> Raw counts; the ratio is a naive diagnostic, not a calibrated series.</li>
+      <li><strong>A detection is not a fire, and not burned area.</strong> Pixels differ: about 1 km (MODIS) and 375 m (VIIRS).</li>
+      <li><strong>No coverage information.</strong> FIRMS files carry no cloud-cover or missing-data information: no detection recorded ≠ no fire.</li>
+      <li><strong>Limited scope.</strong> Two regions in Brazil, 2018–2020.</li>
+      <li><strong>No causal claims.</strong> Not an operational alert, forecast or burned-area product.</li>
+    </ul>
+  </div>
+  <div class="foot"><span>© 2026 Hemerton Silva</span><span>7 / 7</span></div>
+</section>
+
+<script>
+(function () {
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  function current() {
+    var best = 0, bestDist = Infinity;
+    slides.forEach(function (s, i) {
+      var d = Math.abs(s.getBoundingClientRect().top);
+      if (d < bestDist) { bestDist = d; best = i; }
+    });
+    return best;
+  }
+  function go(i) {
+    i = Math.max(0, Math.min(slides.length - 1, i));
+    slides[i].scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+  document.addEventListener('keydown', function (e) {
+    if (e.altKey || e.ctrlKey || e.metaKey) return;
+    var k = e.key;
+    if (k === 'ArrowDown' || k === 'ArrowRight' || k === 'PageDown' || (k === ' ' && !e.shiftKey)) { e.preventDefault(); go(current() + 1); }
+    else if (k === 'ArrowUp' || k === 'ArrowLeft' || k === 'PageUp' || (k === ' ' && e.shiftKey)) { e.preventDefault(); go(current() - 1); }
+    else if (k === 'Home') { e.preventDefault(); go(0); }
+    else if (k === 'End') { e.preventDefault(); go(slides.length - 1); }
+  });
+})();
+</script>
+</body>
+</html>
