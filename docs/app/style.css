@@ -222,6 +222,9 @@ code { font-size: 0.85em; }
 .finding { margin: 10px 0 0; max-width: 75ch; }
 .byline { margin: 8px 0 0; font-size: 0.85rem; color: var(--text-secondary); }
 .signature { margin: 12px 0 0; font-size: 0.8rem; color: var(--text-muted); }
+.signature a { color: var(--link); }
+.about-title { margin-top: 18px; font-size: 0.95rem; }
+.about { margin: 4px 0 0; font-size: 0.85rem; color: var(--text-secondary); max-width: 75ch; }
 
 /* Table view */
 .table-view summary { cursor: pointer; font-weight: 600; font-size: 0.9rem; }
