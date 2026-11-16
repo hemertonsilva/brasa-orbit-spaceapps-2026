@@ -16,7 +16,8 @@ Counting rule
 The FIRMS files carry no information on cloud cover or missing observations, so a zero
 means "no detection recorded", never "no fire".
 
-Built during the NASA Space Apps Challenge 2026 hackathon window.
+Built by Hemerton Silva during the NASA Space Apps Challenge 2026 hackathon window,
+with the help of AI coding assistants; reviewed and tested by the author.
 
 Usage: python3 -I scripts/build_data.py <raw_dir> <output_json>
 """
@@ -33,7 +34,7 @@ YEARS = (2018, 2019, 2020)
 SENSORS = {"modis": "modis", "viirs": "viirs-snpp"}
 REGIONS = {
     "R1": {
-        "name": "Western Mato Grosso (training sector)",
+        "name": "Central-eastern Mato Grosso",
         "lon": [-56.0, -52.0],
         "lat": [-17.0, -10.0],
     },
@@ -93,6 +94,7 @@ def main(raw_dir: Path, out_path: Path) -> None:
             "box_rule": "half-open: lon_min <= lon < lon_max, lat_min <= lat < lat_max",
             "zero_meaning": "no detection recorded; FIRMS files carry no cloud-cover or missing-observation information",
             "not": "not a fire count, not burned area, not a harmonized series",
+            "tooling_note": "pipeline code written with AI assistance and reviewed by the author; counts are computed directly from the FIRMS files",
             "generated_utc": dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
             "inputs": inputs,
         },

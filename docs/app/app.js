@@ -1,5 +1,6 @@
 // Brasa Orbit — daily MODIS vs VIIRS S-NPP calendar.
-// Built during the NASA Space Apps Challenge 2026 hackathon window.
+// Built by Hemerton Silva during the NASA Space Apps Challenge 2026 hackathon window,
+// with the help of AI coding assistants; reviewed and tested by the author.
 (function () {
   "use strict";
 
@@ -48,6 +49,8 @@
     for (var i = 0; i < RBINS.length; i++) if (RBINS[i].test(r)) return RBINS[i].cls;
     return "";
   }
+  // Color and label use the same rounded value, so equal labels never get different colors.
+  function roundRatio(r) { return r < 10 ? Math.round(r * 10) / 10 : Math.round(r); }
   function isoDay(start, offset) {
     var d = new Date(start + "T00:00:00Z");
     d.setUTCDate(d.getUTCDate() + offset);
@@ -62,7 +65,8 @@
   function renderLegends() {
     var ul = document.getElementById("legend");
     var zero = el("li");
-    zero.appendChild(swatch("--empty"));
+    var zs = swatch("--empty"); zs.classList.add("hollow");
+    zero.appendChild(zs);
     zero.appendChild(document.createTextNode("0 (none recorded)"));
     ul.appendChild(zero);
     BINS.forEach(function (b) {
@@ -136,25 +140,30 @@
   }
 
   function renderFinding(mon) {
-    var yearly = state.years.map(function (y) {
+    var yearly = [];
+    state.years.forEach(function (y) {
       var m = 0, v = 0;
       mon[y].forEach(function (c) { m += c.modis; v += c.viirs; });
-      return v / m;
+      if (m > 0) yearly.push(v / m);
     });
-    var lo = Math.min.apply(null, yearly), hi = Math.max.apply(null, yearly);
     var inv = [];
     state.years.forEach(function (y) {
-      mon[y].forEach(function (c, i) { if (c.modis > 0 && c.viirs < c.modis) inv.push(MONTHS[i] + " " + y); });
+      mon[y].forEach(function (c, i) {
+        if (c.modis > 0 && roundRatio(c.viirs / c.modis) < 0.8) inv.push(MONTHS[i] + " " + y);
+      });
     });
     var p = document.getElementById("finding");
     clear(p);
     p.appendChild(el("strong", null, "What stands out: "));
-    var txt = "over a full year, VIIRS records " + fmt1.format(lo) + "–" + fmt1.format(hi) +
-      "× as many detections as MODIS here. ";
+    var txt = "";
+    if (yearly.length) {
+      txt += "over a full year, VIIRS records " + fmt1.format(Math.min.apply(null, yearly)) + "–" +
+        fmt1.format(Math.max.apply(null, yearly)) + "× as many detections as MODIS here. ";
+    }
     txt += inv.length
-      ? "Yet in " + inv.length + " month" + (inv.length > 1 ? "s" : "") + " MODIS records more than VIIRS (" + inv.join(", ") +
-        "). The gap between the two records depends on how and when each sensor observes — exactly what a harmonized calendar has to account for."
-      : "No month in this period has MODIS recording more than VIIRS.";
+      ? "Yet in " + inv.length + " month" + (inv.length > 1 ? "s" : "") + " MODIS records clearly more than VIIRS (ratio below 0.8: " +
+        inv.join(", ") + "). Pixel size, overpass time and the number of satellites can all produce gaps like these; this view shows them but does not correct for them."
+      : "No month in this period has MODIS recording clearly more than VIIRS (ratio below 0.8).";
     p.appendChild(document.createTextNode(txt));
   }
 
@@ -171,9 +180,9 @@
           cell.textContent = "n/a";
           cell.classList.add("na");
         } else {
-          var r = c.viirs / c.modis;
+          var r = roundRatio(c.viirs / c.modis);
           cell.classList.add(rbinOf(r));
-          cell.textContent = (r < 10 ? fmt1.format(r) : fmt.format(Math.round(r))) + "×";
+          cell.textContent = (r < 10 ? fmt1.format(r) : fmt.format(r)) + "×";
         }
         cell.dataset.tip = MONTHS[i] + " " + y + "|" + c.modis + "|" + c.viirs;
         grid.appendChild(cell);
@@ -232,7 +241,9 @@
     state.years.forEach(function (y) {
       mon[y].forEach(function (c, i) {
         var tr = el("tr");
-        tr.appendChild(el("td", null, y + " " + MONTHS[i]));
+        var th = el("th", null, y + " " + MONTHS[i]);
+        th.scope = "row";
+        tr.appendChild(th);
         tr.appendChild(el("td", "num", fmt.format(c.modis)));
         tr.appendChild(el("td", "num", fmt.format(c.viirs)));
         tr.appendChild(el("td", "num", c.modis === 0 ? "n/a" : fmt2.format(c.viirs / c.modis)));
@@ -298,6 +309,7 @@
     ["calendars", "ratio-grid"].forEach(function (id) {
       var n = document.getElementById(id);
       n.addEventListener("pointermove", onMove);
+      n.addEventListener("click", onMove); // tap support on touch screens
       n.addEventListener("pointerleave", hide);
     });
   }
