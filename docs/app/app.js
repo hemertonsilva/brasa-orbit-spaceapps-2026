@@ -160,9 +160,32 @@
       txt += "over a full year, VIIRS records " + fmt1.format(Math.min.apply(null, yearly)) + "–" +
         fmt1.format(Math.max.apply(null, yearly)) + "× as many detections as MODIS here. ";
     }
+    // Timing: busiest month per sensor and year.
+    var peaks = state.years.map(function (y) {
+      function argmax(key) {
+        var best = 0;
+        mon[y].forEach(function (c, i) { if (c[key] > mon[y][best][key]) best = i; });
+        return best;
+      }
+      return { y: y, m: argmax("modis"), v: argmax("viirs") };
+    });
+    var agree = peaks.every(function (p0) { return p0.m === p0.v; });
+    var samePeak = agree && peaks.every(function (p0) { return p0.m === peaks[0].m; });
+    if (samePeak) {
+      txt += "Both sensors agree on timing: the busiest month is " + MONTHS[peaks[0].m] + " in every year. ";
+    } else if (agree) {
+      txt += "Both sensors agree on the busiest month of each year (" +
+        peaks.map(function (p0) { return MONTHS[p0.m] + " " + p0.y; }).join(", ") + "). ";
+    } else {
+      txt += "Busiest month, MODIS vs VIIRS: " +
+        peaks.map(function (p0) { return p0.y + " " + MONTHS[p0.m] + "/" + MONTHS[p0.v]; }).join(", ") + ". ";
+    }
     txt += inv.length
-      ? "Yet in " + inv.length + " month" + (inv.length > 1 ? "s" : "") + " MODIS records clearly more than VIIRS (ratio below 0.8: " +
-        inv.join(", ") + "). Pixel size, overpass time and the number of satellites can all produce gaps like these; this view shows them but does not correct for them."
+      ? "But the size of the gap is not constant: in " + inv.length + " month" + (inv.length > 1 ? "s" : "") +
+        " MODIS records clearly more than VIIRS (ratio below 0.8: " + inv.join(", ") +
+        "), so no single scaling factor converts one record into the other. This inversion is unexpected and still to be verified; " +
+        "pixel size, overpass time and the number of satellites (MODIS on Terra and Aqua, VIIRS on Suomi NPP only) can all produce gaps like these. " +
+        "This view shows them but does not correct for them."
       : "No month in this period has MODIS recording clearly more than VIIRS (ratio below 0.8).";
     p.appendChild(document.createTextNode(txt));
   }
