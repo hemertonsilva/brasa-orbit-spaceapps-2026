@@ -2,7 +2,9 @@
 
 **MODIS and VIIRS active-fire detections, side by side, in one calendar.**
 
-Team **Brasa Orbital** (member: hemertonsilva) · NASA Space Apps Challenge 2026 · Challenge: *Harmonization of MODIS and VIIRS Hot Spots*
+By Hemerton Silva · Team Brasa Orbital · NASA Space Apps Challenge 2026 (Santa Cruz das Palmeiras Local Event, virtual)
+
+Challenge: *Harmonization of MODIS and VIIRS Hot Spots*
 
 Built during the NASA Space Apps Challenge 2026 hackathon window (14–15 Nov 2026).
 
@@ -93,10 +95,7 @@ This step needs coverage and cloud information that the FIRMS CSV files do not p
 
 ## Use of AI tools
 
-- **The idea:** the participant conceived the idea. A concept note dated 13 Nov 2026 records that its conceptual architecture (engines, ontology and processing states) was organized with AI assistance.
-- **During the hackathon window:** AI assistants (Claude, by Anthropic) helped with research, data analysis, code, writing (including this README) and the slides. The participant made the project decisions.
-- **Code:** source files written with AI assistance carry a header saying so (see `scripts/build_data.py`). The data file records `"ai_assistance": true` in `_meta`.
-- **Images:** no AI-generated images are used.
+The author conceived the idea and made the project decisions. AI assistants (Claude, by Anthropic) helped organize the concept (13 Nov 2026) and, during the hackathon window, with research, data analysis, code and writing. No AI-generated images are used.
 
 ## Prior work
 
@@ -104,7 +103,7 @@ This project draws on prior independent feasibility research (private), not incl
 
 ## License
 
-Apache License 2.0 (see `LICENSE`).
+Apache License 2.0 — © 2026 Hemerton Silva (see `LICENSE`).
 
 ## Acknowledgment
 
