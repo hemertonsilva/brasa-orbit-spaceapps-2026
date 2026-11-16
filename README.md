@@ -105,6 +105,12 @@ The author conceived the idea and made the project decisions. AI assistants (Cla
 
 This project draws on prior independent feasibility research (private), not included in this submission. No code or data from that research is used here.
 
+## About the author
+
+Hemerton Silva designs decision and verification workflows: turning loosely defined problems into systems with explicit rules, evidence trails and acceptance criteria. Brasa Orbit applies that discipline to satellite fire records — show what each sensor recorded, state what cannot yet be concluded, and keep every number traceable to its source.
+
+GitHub: https://github.com/hemertonsilva · Space Apps team page: https://www.spaceappschallenge.org/2026/find-a-team/brasa-orbital/
+
 ## License
 
 Apache License 2.0 — © 2026 Hemerton Silva (see [LICENSE](LICENSE)).
