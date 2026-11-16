@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Brasa Orbit — MODIS vs VIIRS fire calendar</title>
 <meta name="description" content="Side-by-side daily calendar of NASA FIRMS active-fire detections from MODIS and VIIRS S-NPP, with the limits of comparison made visible.">
+<meta name="author" content="Hemerton Silva">
 <link rel="stylesheet" href="app/style.css">
 </head>
 <body>
@@ -13,21 +14,49 @@
     <p class="eyebrow">NASA Space Apps Challenge 2026 · Harmonization of MODIS and VIIRS Hot Spots · Team Brasa Orbital</p>
     <h1>Brasa Orbit</h1>
     <p class="lede">A daily calendar of satellite fire detections, MODIS and VIIRS side by side, that shows where the two records agree, where they diverge, and what they cannot tell us.</p>
+    <p class="byline">By Hemerton Silva · Santa Cruz das Palmeiras Local Event (virtual)</p>
   </header>
 
   <section class="context" aria-labelledby="region-title">
+    <div id="region-picker" class="segmented" role="group" aria-label="Area of interest"></div>
     <h2 id="region-title"><span id="region-name">Western Mato Grosso</span> · 2018–2020</h2>
     <p class="meta" id="region-box"></p>
     <p class="meta" id="region-totals"></p>
+    <p class="finding" id="finding"></p>
   </section>
 
-  <section class="legend" aria-label="Color legend">
-    <span class="legend-title">Detections per day</span>
+  <section class="ratio" aria-labelledby="ratio-title">
+    <h2 id="ratio-title">Monthly VIIRS / MODIS ratio</h2>
+    <p class="meta">How many VIIRS detections for each MODIS detection, month by month. <strong>A naive diagnostic, not a harmonization:</strong> it mixes pixel size, overpass times and number of satellites.</p>
+    <div id="ratio-grid" class="ratio-grid" role="img" aria-label="Monthly ratio of VIIRS to MODIS detections; the monthly table below lists the same values."></div>
+    <ul id="ratio-legend" class="legend-scale ratio-legend"></ul>
+  </section>
+
+  <section class="legend" aria-label="Color legend for the daily calendars">
+    <span class="legend-title">Daily calendars · detections per day</span>
     <ul id="legend" class="legend-scale"></ul>
     <p class="legend-note">Same scale for both sensors. A light gray cell means <strong>no detection recorded</strong> — not “no fire”: the files carry no cloud or coverage information.</p>
   </section>
 
   <section id="calendars" class="calendars" aria-label="Daily calendars by year"></section>
+
+  <section class="table-view">
+    <details>
+      <summary>Table view (monthly totals)</summary>
+      <table>
+        <caption id="table-caption"></caption>
+        <thead><tr><th scope="col">Month</th><th scope="col" class="num">MODIS</th><th scope="col" class="num">VIIRS</th><th scope="col" class="num">VIIRS / MODIS</th></tr></thead>
+        <tbody id="table-body"></tbody>
+      </table>
+    </details>
+  </section>
+
+  <section class="next" aria-labelledby="next-title">
+    <h2 id="next-title">Next step: compare what was actually observed</h2>
+    <p>Counting detections is not enough to compare sensors: a month can look quiet because of clouds or fewer overpasses, not less fire. The method proposed for Brasa Orbit normalizes detections by the area each sensor could actually observe:</p>
+    <p class="formula"><span>Y = 1,000 × ΣD / E</span></p>
+    <p>where <em>D</em> are detections inside the common usable footprint of comparable overpasses and <em>E</em> is the exposure — the observable area accumulated over those overpasses (km² · pass). Months without usable exposure get no rate instead of a false zero. This requires swath-level coverage data and is <strong>not implemented in this prototype</strong>.</p>
+  </section>
 
   <footer class="notes">
     <h2>What these numbers are — and are not</h2>
@@ -38,6 +67,7 @@
       <li>We acknowledge the use of imagery from the NASA LANCE FIRMS (<a href="https://www.earthdata.nasa.gov/data/tools/firms">earthdata.nasa.gov/data/tools/firms</a>).</li>
       <li>Built during the hackathon window (14–15 Nov 2026). Code and method notes are in the project repository.</li>
     </ul>
+    <p class="signature">© 2026 Hemerton Silva · Team Brasa Orbital · Code released under the Apache License 2.0.</p>
   </footer>
 </main>
 <div id="tooltip" class="tooltip" role="status" aria-live="polite" hidden></div>

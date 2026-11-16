@@ -4,7 +4,6 @@
   "use strict";
 
   var DATA_URL = "data/firms_daily_2018_2020.json";
-  var REGION = "R1";
   // Same bins for both sensors, so the panels stay comparable as raw counts.
   var BINS = [
     { min: 1, max: 9, cls: "b1", label: "1–9" },
@@ -13,12 +12,25 @@
     { min: 200, max: 999, cls: "b4", label: "200–999" },
     { min: 1000, max: Infinity, cls: "b5", label: "1,000+" }
   ];
+  // Monthly VIIRS / MODIS ratio, diverging around 1 (neutral band 0.8–1.25).
+  var RBINS = [
+    { test: function (r) { return r < 0.5; }, cls: "r-3", label: "< 0.5× (MODIS far higher)" },
+    { test: function (r) { return r < 0.8; }, cls: "r-2", label: "0.5–0.8×" },
+    { test: function (r) { return r < 1.25; }, cls: "r0", label: "0.8–1.25× (similar)" },
+    { test: function (r) { return r < 2; }, cls: "r2", label: "1.25–2×" },
+    { test: function (r) { return r < 4; }, cls: "r3", label: "2–4×" },
+    { test: function () { return true; }, cls: "r4", label: "≥ 4× (VIIRS far higher)" }
+  ];
   var SENSORS = [
     { key: "modis", name: "MODIS", detail: "Terra + Aqua · ~1 km" },
     { key: "viirs", name: "VIIRS", detail: "S-NPP · 375 m" }
   ];
   var MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
   var fmt = new Intl.NumberFormat("en-US");
+  var fmt1 = new Intl.NumberFormat("en-US", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+  var fmt2 = new Intl.NumberFormat("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+  var state = { data: null, region: "R1", index: null, years: [] };
 
   function el(tag, cls, text) {
     var n = document.createElement(tag);
@@ -26,61 +38,153 @@
     if (text != null) n.textContent = text;
     return n;
   }
-
+  function clear(node) { while (node.firstChild) node.removeChild(node.firstChild); }
+  function pad(n) { return String(n).padStart(2, "0"); }
   function binOf(v) {
     for (var i = 0; i < BINS.length; i++) if (v >= BINS[i].min && v <= BINS[i].max) return BINS[i].cls;
     return "";
   }
-
+  function rbinOf(r) {
+    for (var i = 0; i < RBINS.length; i++) if (RBINS[i].test(r)) return RBINS[i].cls;
+    return "";
+  }
   function isoDay(start, offset) {
     var d = new Date(start + "T00:00:00Z");
     d.setUTCDate(d.getUTCDate() + offset);
     return d.toISOString().slice(0, 10);
   }
+  function swatch(cssVar) {
+    var s = el("span", "swatch");
+    s.style.background = "var(" + cssVar + ")";
+    return s;
+  }
 
-  function renderLegend() {
+  function renderLegends() {
     var ul = document.getElementById("legend");
     var zero = el("li");
-    var zs = el("span", "swatch");
-    zs.style.background = "var(--empty)";
-    zero.appendChild(zs);
+    zero.appendChild(swatch("--empty"));
     zero.appendChild(document.createTextNode("0 (none recorded)"));
     ul.appendChild(zero);
     BINS.forEach(function (b) {
       var li = el("li");
-      var s = el("span", "swatch");
-      s.style.background = "var(--seq-" + b.cls.slice(1) + ")";
-      li.appendChild(s);
+      li.appendChild(swatch("--seq-" + b.cls.slice(1)));
       li.appendChild(document.createTextNode(b.label));
       ul.appendChild(li);
     });
+    var rl = document.getElementById("ratio-legend");
+    RBINS.forEach(function (b) {
+      var li = el("li");
+      li.appendChild(swatch("--" + b.cls));
+      li.appendChild(document.createTextNode(b.label));
+      rl.appendChild(li);
+    });
+    var na = el("li");
+    na.appendChild(swatch("--empty"));
+    na.appendChild(document.createTextNode("n/a (MODIS = 0)"));
+    rl.appendChild(na);
   }
 
-  function build(data) {
-    var region = data.regions[REGION];
-    var series = data.series[REGION];
+  function monthly(series) {
+    // year -> month -> {modis, viirs}
+    var out = {};
+    for (var i = 0; i < state.data.days; i++) {
+      var iso = isoDay(state.data.start, i);
+      var y = iso.slice(0, 4), m = +iso.slice(5, 7) - 1;
+      out[y] = out[y] || MONTHS.map(function () { return { modis: 0, viirs: 0 }; });
+      out[y][m].modis += series.modis[i];
+      out[y][m].viirs += series.viirs[i];
+    }
+    return out;
+  }
+
+  function renderRegionPicker() {
+    var host = document.getElementById("region-picker");
+    Object.keys(state.data.regions).forEach(function (rid) {
+      var b = el("button", "seg", rid + " · " + state.data.regions[rid].name);
+      b.type = "button";
+      b.dataset.region = rid;
+      b.setAttribute("aria-pressed", String(rid === state.region));
+      b.addEventListener("click", function () { setRegion(rid); });
+      host.appendChild(b);
+    });
+  }
+
+  function setRegion(rid) {
+    state.region = rid;
+    Array.prototype.forEach.call(document.querySelectorAll("#region-picker .seg"), function (b) {
+      b.setAttribute("aria-pressed", String(b.dataset.region === rid));
+    });
+    try { history.replaceState(null, "", "#" + rid); } catch (e) { /* ignore */ }
+    renderRegion();
+  }
+
+  function renderRegion() {
+    var data = state.data, region = data.regions[state.region], series = data.series[state.region];
     document.getElementById("region-name").textContent = region.name;
     document.getElementById("region-box").textContent =
-      "Box: longitude " + region.lon[0] + "° to " + region.lon[1] + "° (exclusive), latitude " +
-      region.lat[0] + "° to " + region.lat[1] + "° (exclusive). FIRMS detections with type = 0, day and night.";
-
-    // index: year -> month -> day -> offset
-    var byDate = {};
-    var years = [];
-    for (var i = 0; i < data.days; i++) {
-      var iso = isoDay(data.start, i);
-      byDate[iso] = i;
-      var y = +iso.slice(0, 4);
-      if (years.indexOf(y) < 0) years.push(y);
-    }
-
-    var totals = { modis: 0, viirs: 0 };
-    SENSORS.forEach(function (s) { totals[s.key] = series[s.key].reduce(function (a, b) { return a + b; }, 0); });
+      "Box: longitude " + region.lon[0] + "° to " + region.lon[1] + "° (upper edge excluded), latitude " +
+      region.lat[0] + "° to " + region.lat[1] + "° (upper edge excluded). FIRMS detections with type = 0, day and night.";
+    var tm = series.modis.reduce(function (a, b) { return a + b; }, 0);
+    var tv = series.viirs.reduce(function (a, b) { return a + b; }, 0);
     document.getElementById("region-totals").textContent =
-      "Total detections 2018–2020: MODIS " + fmt.format(totals.modis) + " · VIIRS " + fmt.format(totals.viirs) + ".";
+      "Total detections 2018–2020: MODIS " + fmt.format(tm) + " · VIIRS " + fmt.format(tv) + ".";
+    var mon = monthly(series);
+    renderFinding(mon);
+    renderRatio(mon);
+    renderCalendars(series);
+    renderTable(mon);
+  }
 
+  function renderFinding(mon) {
+    var yearly = state.years.map(function (y) {
+      var m = 0, v = 0;
+      mon[y].forEach(function (c) { m += c.modis; v += c.viirs; });
+      return v / m;
+    });
+    var lo = Math.min.apply(null, yearly), hi = Math.max.apply(null, yearly);
+    var inv = [];
+    state.years.forEach(function (y) {
+      mon[y].forEach(function (c, i) { if (c.modis > 0 && c.viirs < c.modis) inv.push(MONTHS[i] + " " + y); });
+    });
+    var p = document.getElementById("finding");
+    clear(p);
+    p.appendChild(el("strong", null, "What stands out: "));
+    var txt = "over a full year, VIIRS records " + fmt1.format(lo) + "–" + fmt1.format(hi) +
+      "× as many detections as MODIS here. ";
+    txt += inv.length
+      ? "Yet in " + inv.length + " month" + (inv.length > 1 ? "s" : "") + " MODIS records more than VIIRS (" + inv.join(", ") +
+        "). The gap between the two records depends on how and when each sensor observes — exactly what a harmonized calendar has to account for."
+      : "No month in this period has MODIS recording more than VIIRS.";
+    p.appendChild(document.createTextNode(txt));
+  }
+
+  function renderRatio(mon) {
+    var grid = document.getElementById("ratio-grid");
+    clear(grid);
+    grid.appendChild(el("span", "mlabel", ""));
+    MONTHS.forEach(function (m) { grid.appendChild(el("span", "dlabel", m)); });
+    state.years.forEach(function (y) {
+      grid.appendChild(el("span", "mlabel", String(y)));
+      mon[y].forEach(function (c, i) {
+        var cell = el("span", "rcell");
+        if (c.modis === 0) {
+          cell.textContent = "n/a";
+          cell.classList.add("na");
+        } else {
+          var r = c.viirs / c.modis;
+          cell.classList.add(rbinOf(r));
+          cell.textContent = (r < 10 ? fmt1.format(r) : fmt.format(Math.round(r))) + "×";
+        }
+        cell.dataset.tip = MONTHS[i] + " " + y + "|" + c.modis + "|" + c.viirs;
+        grid.appendChild(cell);
+      });
+    });
+  }
+
+  function renderCalendars(series) {
     var host = document.getElementById("calendars");
-    years.forEach(function (year) {
+    clear(host);
+    state.years.forEach(function (year) {
       var block = el("article", "year-block");
       block.appendChild(el("h3", null, String(year)));
       var pair = el("div", "pair");
@@ -96,8 +200,7 @@
         for (var m = 0; m < 12; m++) {
           grid.appendChild(el("span", "mlabel", MONTHS[m]));
           for (var day = 1; day <= 31; day++) {
-            var iso = year + "-" + String(m + 1).padStart(2, "0") + "-" + String(day).padStart(2, "0");
-            var idx = byDate[iso];
+            var idx = state.index[year + "-" + pad(m + 1) + "-" + pad(day)];
             var cell = el("span", "cell");
             if (idx === undefined) {
               cell.classList.add("void");
@@ -112,7 +215,8 @@
           }
         }
         h.appendChild(el("span", "total", fmt.format(yearTotal) + " in " + year));
-        grid.setAttribute("aria-label", s.name + " daily detections in " + year + ", total " + fmt.format(yearTotal) + ". See the notes for limits.");
+        grid.setAttribute("aria-label", s.name + " daily detections in " + year + ", total " + fmt.format(yearTotal) +
+          ". The monthly table below lists the same data.");
         panel.appendChild(h);
         panel.appendChild(grid);
         pair.appendChild(panel);
@@ -120,11 +224,26 @@
       block.appendChild(pair);
       host.appendChild(block);
     });
-
-    wireTooltip(data, series);
   }
 
-  function wireTooltip(data, series) {
+  function renderTable(mon) {
+    var tbody = document.getElementById("table-body");
+    clear(tbody);
+    state.years.forEach(function (y) {
+      mon[y].forEach(function (c, i) {
+        var tr = el("tr");
+        tr.appendChild(el("td", null, y + " " + MONTHS[i]));
+        tr.appendChild(el("td", "num", fmt.format(c.modis)));
+        tr.appendChild(el("td", "num", fmt.format(c.viirs)));
+        tr.appendChild(el("td", "num", c.modis === 0 ? "n/a" : fmt2.format(c.viirs / c.modis)));
+        tbody.appendChild(tr);
+      });
+    });
+    document.getElementById("table-caption").textContent =
+      "Monthly detections, " + state.data.regions[state.region].name + " (type = 0, UTC dates).";
+  }
+
+  function wireTooltip() {
     var tip = document.getElementById("tooltip");
     var active = null;
     function hide() {
@@ -132,41 +251,78 @@
       if (active) active.classList.remove("active");
       active = null;
     }
-    document.getElementById("calendars").addEventListener("pointermove", function (ev) {
+    function row(label, value) {
+      var r = el("div", "tt-row");
+      r.appendChild(el("span", null, label));
+      r.appendChild(el("span", null, value));
+      tip.appendChild(r);
+    }
+    function place(ev) {
+      var x = ev.clientX + 14, y = ev.clientY + 14;
+      var w = tip.offsetWidth, h = tip.offsetHeight;
+      if (x + w > window.innerWidth - 8) x = ev.clientX - w - 14;
+      if (y + h > window.innerHeight - 8) y = ev.clientY - h - 14;
+      tip.style.left = Math.max(8, x) + "px";
+      tip.style.top = Math.max(8, y) + "px";
+    }
+    function onMove(ev) {
       var t = ev.target;
-      if (!t.classList || !t.classList.contains("cell") || t.dataset.v === undefined) { hide(); return; }
-      var idx = +t.dataset.v;
+      var isCell = t.classList && t.classList.contains("cell") && t.dataset.v !== undefined;
+      var isR = t.classList && t.classList.contains("rcell") && t.dataset.tip;
+      if (!isCell && !isR) { hide(); return; }
       if (active !== t) {
         if (active) active.classList.remove("active");
         active = t;
         t.classList.add("active");
         tip.textContent = "";
-        tip.appendChild(el("div", "tt-date", isoDay(data.start, idx) + " (UTC)"));
-        SENSORS.forEach(function (s) {
-          var row = el("div", "tt-row");
-          var v = series[s.key][idx];
-          row.appendChild(el("span", null, s.name));
-          row.appendChild(el("span", null, v === 0 ? "0 · none recorded" : fmt.format(v)));
-          tip.appendChild(row);
-        });
+        var series = state.data.series[state.region];
+        if (isCell) {
+          var idx = +t.dataset.v;
+          tip.appendChild(el("div", "tt-date", isoDay(state.data.start, idx) + " (UTC)"));
+          SENSORS.forEach(function (s) {
+            var v = series[s.key][idx];
+            row(s.name, v === 0 ? "0 · none recorded" : fmt.format(v));
+          });
+        } else {
+          var parts = t.dataset.tip.split("|");
+          var m = +parts[1], v2 = +parts[2];
+          tip.appendChild(el("div", "tt-date", parts[0]));
+          row("MODIS", fmt.format(m));
+          row("VIIRS", fmt.format(v2));
+          row("VIIRS / MODIS", m === 0 ? "n/a" : fmt2.format(v2 / m) + "×");
+        }
         tip.hidden = false;
       }
-      var x = ev.clientX + 14, y = ev.clientY + 14;
-      var w = tip.offsetWidth, h = tip.offsetHeight;
-      if (x + w > window.innerWidth - 8) x = ev.clientX - w - 14;
-      if (y + h > window.innerHeight - 8) y = ev.clientY - h - 14;
-      tip.style.left = x + "px";
-      tip.style.top = y + "px";
+      place(ev);
+    }
+    ["calendars", "ratio-grid"].forEach(function (id) {
+      var n = document.getElementById(id);
+      n.addEventListener("pointermove", onMove);
+      n.addEventListener("pointerleave", hide);
     });
-    document.getElementById("calendars").addEventListener("pointerleave", hide);
   }
 
-  renderLegend();
+  function init(data) {
+    state.data = data;
+    state.index = {};
+    for (var i = 0; i < data.days; i++) {
+      var iso = isoDay(data.start, i);
+      state.index[iso] = i;
+      var y = +iso.slice(0, 4);
+      if (state.years.indexOf(y) < 0) state.years.push(y);
+    }
+    var fromHash = (location.hash || "").replace("#", "");
+    if (data.regions[fromHash]) state.region = fromHash;
+    renderRegionPicker();
+    renderRegion();
+    wireTooltip();
+  }
+
+  renderLegends();
   fetch(DATA_URL)
     .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
-    .then(build)
+    .then(init)
     .catch(function (err) {
-      var host = document.getElementById("calendars");
-      host.appendChild(el("p", "meta", "Could not load data (" + err.message + ")."));
+      document.getElementById("calendars").appendChild(el("p", "meta", "Could not load data (" + err.message + ")."));
     });
 })();
