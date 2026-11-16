@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Brasa Orbit — MODIS vs VIIRS fire calendar</title>
+<meta name="description" content="Side-by-side daily calendar of NASA FIRMS active-fire detections from MODIS and VIIRS S-NPP, with the limits of comparison made visible.">
+<link rel="stylesheet" href="app/style.css">
+</head>
+<body>
+<main class="viz-root">
+  <header class="masthead">
+    <p class="eyebrow">NASA Space Apps Challenge 2026 · Harmonization of MODIS and VIIRS Hot Spots · Team Brasa Orbital</p>
+    <h1>Brasa Orbit</h1>
+    <p class="lede">A daily calendar of satellite fire detections, MODIS and VIIRS side by side, that shows where the two records agree, where they diverge, and what they cannot tell us.</p>
+  </header>
+
+  <section class="context" aria-labelledby="region-title">
+    <h2 id="region-title"><span id="region-name">Western Mato Grosso</span> · 2018–2020</h2>
+    <p class="meta" id="region-box"></p>
+    <p class="meta" id="region-totals"></p>
+  </section>
+
+  <section class="legend" aria-label="Color legend">
+    <span class="legend-title">Detections per day</span>
+    <ul id="legend" class="legend-scale"></ul>
+    <p class="legend-note">Same scale for both sensors. A light gray cell means <strong>no detection recorded</strong> — not “no fire”: the files carry no cloud or coverage information.</p>
+  </section>
+
+  <section id="calendars" class="calendars" aria-label="Daily calendars by year"></section>
+
+  <footer class="notes">
+    <h2>What these numbers are — and are not</h2>
+    <ul>
+      <li>Each count is a NASA FIRMS active-fire <strong>detection</strong> (a pixel flagged with one or more fires or thermal anomalies), filtered to <code>type = 0</code> (presumed vegetation fire). It is not a count of fires and not burned area.</li>
+      <li>MODIS pixels are about 1 km; VIIRS I-band pixels are 375 m, and the satellites pass at different times. Raw counts from the two sensors are <strong>not directly comparable</strong>; this view does not harmonize them.</li>
+      <li>Dates are the acquisition date in UTC as published by FIRMS. Data: FIRMS standard (archive) yearly country files for Brazil — MODIS version 6.03 and VIIRS S-NPP version 2, as labelled in the files.</li>
+      <li>We acknowledge the use of imagery from the NASA LANCE FIRMS (<a href="https://www.earthdata.nasa.gov/data/tools/firms">earthdata.nasa.gov/data/tools/firms</a>).</li>
+      <li>Built during the hackathon window (14–15 Nov 2026) with the help of an AI coding assistant; see the repository README for details.</li>
+    </ul>
+  </footer>
+</main>
+<div id="tooltip" class="tooltip" role="status" aria-live="polite" hidden></div>
+<script src="app/app.js" defer></script>
+</body>
+</html>
