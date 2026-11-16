@@ -32,6 +32,14 @@
     <ul id="ratio-legend" class="legend-scale ratio-legend"></ul>
   </section>
 
+  <section class="anom" aria-labelledby="anom-title">
+    <h2 id="anom-title">Unusual months — each sensor against its own history</h2>
+    <p class="meta" id="anom-caption">Each cell compares a month’s raw FIRMS detections with the same month in the other two years (2018–2020), separately for MODIS and VIIRS, so a stable sensitivity gap between the sensors drops out. Sensor agreement indicates a consistent relative pattern, not harmonized counts, burned area, or causes. Cells with few detections are not classified. Hover or tap a cell for counts.</p>
+    <div id="anom-grid" class="ratio-grid" role="img" aria-label="Unusual months by year: both sensors above usual, both below usual, sensors disagree, usual, or insufficient baseline. The tooltip and the table list the values."></div>
+    <ul id="anom-legend" class="legend-scale ratio-legend"></ul>
+    <p class="finding" id="anom-finding"></p>
+  </section>
+
   <section class="legend" aria-label="Color legend for the daily calendars">
     <span class="legend-title">Daily calendars · detections per day</span>
     <ul id="legend" class="legend-scale"></ul>
@@ -63,6 +71,7 @@
     <ul>
       <li>Each count is a NASA FIRMS active-fire <strong>detection</strong> (a pixel flagged with one or more fires or thermal anomalies), filtered to <code>type = 0</code> (presumed vegetation fire). It is not a count of fires and not burned area.</li>
       <li>MODIS pixels are about 1 km; VIIRS I-band pixels are 375 m, and the satellites pass at different times. Raw counts from the two sensors are <strong>not directly comparable</strong>; this view does not harmonize them.</li>
+      <li>Unusual months panel: with only three years, each baseline is two years, so one extreme year pushes the others down; clouds and smoke affect both sensors alike, so their agreement is not independent confirmation of changed fire activity.</li>
       <li>Dates are the acquisition date in UTC as published by FIRMS. Data: FIRMS standard (archive) yearly country files for Brazil — MODIS version 6.03 and VIIRS S-NPP version 2, as labelled in the files.</li>
       <li>We acknowledge the use of data and/or imagery from NASA's Fire Information for Resource Management System (FIRMS) (<a href="https://earthdata.nasa.gov/firms">https://earthdata.nasa.gov/firms</a>), part of NASA's Land, Atmosphere Near real-time Capability for Earth observations (LANCE) (<a href="https://earthdata.nasa.gov/lance">https://earthdata.nasa.gov/lance</a>) and NASA's Earth Science Data and Information System (ESDIS).</li>
       <li>Built during the hackathon window (14–15 Nov 2026). Code, data pipeline and method notes: <a href="https://github.com/hemertonsilva/brasa-orbit-spaceapps-2026">github.com/hemertonsilva/brasa-orbit-spaceapps-2026</a>.</li>

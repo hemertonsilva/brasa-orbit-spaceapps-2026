@@ -86,6 +86,14 @@
     na.appendChild(swatch("--empty"));
     na.appendChild(document.createTextNode("n/a (MODIS = 0)"));
     rl.appendChild(na);
+    var al = document.getElementById("anom-legend");
+    ACLASSES.forEach(function (s) {
+      var li = el("li");
+      var sw = el("span", "swatch acell-sw " + s.cls);
+      li.appendChild(sw);
+      li.appendChild(document.createTextNode(s.mark + " " + s.label));
+      al.appendChild(li);
+    });
   }
 
   function monthly(series) {
@@ -135,6 +143,7 @@
     var mon = monthly(series);
     renderFinding(mon);
     renderRatio(mon);
+    renderAnomaly(mon);
     renderCalendars(series);
     renderTable(mon);
   }
@@ -212,6 +221,64 @@
         grid.appendChild(cell);
       });
     });
+  }
+
+  // Unusual months: each sensor against the same month in the other two years.
+  // Rules from the scientific review: minimum baseline per sensor, per-year floor,
+  // and a count difference of at least 2*sqrt(baseline) before classifying.
+  var ANOM_UP = 1.5, ANOM_DOWN = 0.67;
+  var ANOM_MIN = { modis: { mean: 20, year: 5 }, viirs: { mean: 60, year: 15 } };
+  var ACLASSES = [
+    { cls: "a-up", mark: "▲▲", label: "Both sensors ≥ 1.5× the other two years" },
+    { cls: "a-down", mark: "▼▼", label: "Both sensors ≤ 0.67× the other two years" },
+    { cls: "a-dis", mark: "≠", label: "Sensors disagree" },
+    { cls: "a-usual", mark: "·", label: "Similar to the other two years" },
+    { cls: "a-low", mark: "–", label: "Insufficient data (not classified)" }
+  ];
+  function anomalyOf(mon, y, i) {
+    var others = state.years.filter(function (o) { return o !== y; });
+    var out = { valid: true };
+    var dirs = {};
+    ["modis", "viirs"].forEach(function (k) {
+      var vals = others.map(function (o) { return mon[o][i][k]; });
+      var base = vals.reduce(function (a, b) { return a + b; }, 0) / vals.length;
+      var count = mon[y][i][k];
+      out[k] = base > 0 ? count / base : null;
+      out[k + "Count"] = count;
+      out[k + "Base"] = base;
+      var ok = base >= ANOM_MIN[k].mean && vals.every(function (v) { return v >= ANOM_MIN[k].year; });
+      if (!ok) { out.valid = false; dirs[k] = 0; return; }
+      var sig = Math.abs(count - base) >= 2 * Math.sqrt(base);
+      var r = out[k];
+      dirs[k] = !sig ? 0 : (r >= ANOM_UP ? 1 : (r <= ANOM_DOWN ? -1 : 0));
+    });
+    var dm = dirs.modis, dv = dirs.viirs;
+    out.cls = !out.valid ? "a-low" : (dm === 1 && dv === 1 ? "a-up" : (dm === -1 && dv === -1 ? "a-down" : (dm !== dv ? "a-dis" : "a-usual")));
+    return out;
+  }
+  function renderAnomaly(mon) {
+    var grid = document.getElementById("anom-grid");
+    clear(grid);
+    grid.appendChild(el("span", "mlabel", ""));
+    MONTHS.forEach(function (m) { grid.appendChild(el("span", "dlabel", m)); });
+    var ups = [], dis = [];
+    state.years.forEach(function (y) {
+      grid.appendChild(el("span", "mlabel", String(y)));
+      mon[y].forEach(function (c, i) {
+        var a = anomalyOf(mon, y, i);
+        var spec = ACLASSES.filter(function (s) { return s.cls === a.cls; })[0];
+        var cell = el("span", "rcell acell " + a.cls, spec.mark);
+        cell.dataset.tip = [MONTHS[i] + " " + y, a.modis === null ? "" : a.modis, a.viirs === null ? "" : a.viirs, spec.label, a.modisCount, Math.round(a.modisBase), a.viirsCount, Math.round(a.viirsBase)].join("|");
+        grid.appendChild(cell);
+        if (a.cls === "a-up") ups.push(MONTHS[i] + " " + y);
+        if (a.cls === "a-dis") dis.push(MONTHS[i] + " " + y);
+      });
+    });
+    var p = document.getElementById("anom-finding");
+    clear(p);
+    p.appendChild(el("strong", null, "Months unusual in both sensors (vs. the other two years): "));
+    p.appendChild(document.createTextNode((ups.length ? ups.join(", ") : "none") + ". " +
+      (dis.length ? "Sensors disagree in " + dis.length + " month" + (dis.length > 1 ? "s" : "") + " (" + dis.join(", ") + "); read those with caution." : "")));
   }
 
   function renderCalendars(series) {
@@ -318,6 +385,12 @@
             var v = series[s.key][idx];
             row(s.name, v === 0 ? "0 · none recorded" : fmt.format(v));
           });
+        } else if (t.classList.contains("acell")) {
+          var ap = t.dataset.tip.split("|");
+          tip.appendChild(el("div", "tt-date", ap[0]));
+          row("MODIS", fmt.format(+ap[4]) + " vs " + fmt.format(+ap[5]) + " (" + (ap[1] === "" ? "n/a" : fmt2.format(+ap[1]) + "×") + ")");
+          row("VIIRS", fmt.format(+ap[6]) + " vs " + fmt.format(+ap[7]) + " (" + (ap[2] === "" ? "n/a" : fmt2.format(+ap[2]) + "×") + ")");
+          tip.appendChild(el("div", "tt-note", ap[3]));
         } else {
           var parts = t.dataset.tip.split("|");
           var m = +parts[1], v2 = +parts[2];
@@ -330,7 +403,7 @@
       }
       place(ev);
     }
-    ["calendars", "ratio-grid"].forEach(function (id) {
+    ["calendars", "ratio-grid", "anom-grid"].forEach(function (id) {
       var n = document.getElementById(id);
       n.addEventListener("pointermove", onMove);
       n.addEventListener("click", onMove); // tap support on touch screens

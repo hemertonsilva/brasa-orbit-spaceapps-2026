@@ -241,11 +241,31 @@ code { font-size: 0.85em; }
   padding: 4px 10px; color: var(--text-primary);
 }
 
+
+/* Unusual months (each sensor vs its own history) */
+:root { --a-up: #eb6834; --a-up-ink: #0b0b0b; --a-down: #86b6ef; --a-down-ink: #0b0b0b; }
+@media (prefers-color-scheme: dark) {
+  :root:where(:not([data-theme="light"])) { --a-up: #d95926; --a-up-ink: #0b0b0b; --a-down: #3987e5; --a-down-ink: #0b0b0b; }
+}
+:root[data-theme="dark"] { --a-up: #d95926; --a-up-ink: #0b0b0b; --a-down: #3987e5; --a-down-ink: #0b0b0b; }
+.anom { background: var(--surface-1); border: 1px solid var(--border); border-radius: 12px; padding: 16px 20px; margin-bottom: 12px; }
+.rcell.a-up { background: var(--a-up); color: var(--a-up-ink); font-weight: 700; }
+.rcell.a-down { background: var(--a-down); color: var(--a-down-ink); font-weight: 700; }
+.rcell.a-dis { background: repeating-linear-gradient(135deg, var(--r0) 0 4px, var(--grid) 4px 8px); color: var(--text-primary); font-weight: 700; }
+.rcell.a-usual { background: var(--r0); color: var(--text-muted); box-shadow: inset 0 0 0 1px var(--border); }
+.rcell.a-low { background: transparent; color: var(--text-muted); box-shadow: inset 0 0 0 1px var(--zero-ring); }
+.swatch.acell-sw.a-up { background: var(--a-up); }
+.swatch.acell-sw.a-down { background: var(--a-down); }
+.swatch.acell-sw.a-dis { background: repeating-linear-gradient(135deg, var(--r0) 0 3px, var(--grid) 3px 6px); }
+.swatch.acell-sw.a-usual { background: var(--r0); }
+.swatch.acell-sw.a-low { background: transparent; box-shadow: inset 0 0 0 1px var(--zero-ring); }
+.tooltip .tt-note { margin-top: 4px; color: var(--text-secondary); font-size: 0.75rem; }
+
 @media (max-width: 760px) {
   .ratio-grid { grid-template-columns: 2.6em repeat(12, minmax(0, 1fr)); }
   .rcell { font-size: 0.68rem; min-height: 26px; }
   .rcell .x { display: none; }
   .pair { grid-template-columns: 1fr; gap: 16px; }
   h1 { font-size: 1.6rem; }
-  .masthead, .context, .legend, .notes, .year-block, .ratio, .table-view, .next { padding: 12px 10px; }
+  .masthead, .context, .legend, .notes, .year-block, .ratio, .table-view, .next, .anom { padding: 12px 10px; }
 }
