@@ -14,8 +14,8 @@
     --text-2: #c3c2b7;
     --muted: #a3a198;
     --ember: #f08a3c;
-    --modis: #e8913a;
-    --viirs: #6da7ec;
+    --viirs-higher: #6da7ec;
+    --modis-higher: #e66767;
     --parity: #f0efec;
   }
   * { box-sizing: border-box; }
@@ -56,16 +56,13 @@
   li::marker { color: var(--ember); }
   strong { color: var(--text); }
   code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .9em; color: var(--text); }
-  a { color: var(--viirs); }
+  a { color: var(--viirs-higher); }
   .meta { color: var(--muted); font-size: clamp(14px, 1.6vw, 18px); margin: 4px 0; }
   .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(20px, 4vw, 56px); align-items: start; }
   .grid2 > * { min-width: 0; }
   .kicker, p, li { overflow-wrap: break-word; }
   .card { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: clamp(16px, 2.4vw, 28px); }
   .card h3 { margin: 0 0 10px; font-size: clamp(17px, 2vw, 22px); }
-  .sw { display: inline-block; width: .8em; height: .8em; border-radius: 2px; vertical-align: -.05em; margin-right: .35em; }
-  .sw.modis { background: var(--modis); }
-  .sw.viirs { background: var(--viirs); }
 
   /* slide 3 screenshot */
   .shot { width: 100%; border: 1px solid var(--line); border-radius: 10px; display: block; background: var(--surface); }
@@ -76,17 +73,19 @@
   }
 
   /* slide 4 finding */
-  .big { font-size: clamp(56px, 10vw, 128px); font-weight: 700; line-height: 1; color: var(--viirs); letter-spacing: -.03em; }
-  .big.modis { color: var(--modis); }
-  .bigcap { color: var(--text-2); font-size: clamp(15px, 1.8vw, 20px); margin: 8px 0 0; max-width: 28ch; }
-  .bars { display: grid; grid-template-columns: auto 1fr; gap: 6px 12px; align-items: center; font-size: clamp(13px, 1.5vw, 16px); }
+  .big { font-size: clamp(44px, 6.4vw, 84px); font-weight: 700; line-height: 1; color: var(--viirs-higher); letter-spacing: -.03em; }
+  .big.modis { color: var(--modis-higher); }
+  h2.long { font-size: clamp(24px, 3.2vw, 40px); }
+  .note { font-size: clamp(14px, 1.6vw, 18px); color: var(--text-2); margin: 12px 0 0; max-width: 44ch; }
+  .bigcap { color: var(--text-2); font-size: clamp(15px, 1.8vw, 20px); margin: 8px 0 0; max-width: 38ch; }
+  .bars { display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; align-items: center; font-size: clamp(13px, 1.5vw, 16px); }
   .bars .lab { color: var(--muted); white-space: nowrap; }
-  .track { position: relative; height: 18px; }
+  .track { position: relative; height: 15px; }
   .track::after {
     content: ""; position: absolute; top: -3px; bottom: -3px; left: 25%; border-left: 2px dashed var(--parity); opacity: .55;
   }
-  .bar { height: 100%; width: calc(var(--v) / 4 * 100%); border-radius: 3px; background: var(--viirs); display: flex; align-items: center; }
-  .bar.low { background: var(--modis); }
+  .bar { height: 100%; width: calc(var(--v) / 4 * 100%); border-radius: 3px; background: var(--viirs-higher); display: flex; align-items: center; }
+  .bar.low { background: var(--modis-higher); }
   .bar span { position: relative; left: calc(100% + 6px); color: var(--text); white-space: nowrap; font-variant-numeric: tabular-nums; }
   .bars .sep { grid-column: 1 / -1; height: 6px; }
   .legend { color: var(--muted); font-size: clamp(13px, 1.4vw, 15px); margin-top: 14px; }
@@ -140,12 +139,12 @@
     <h2>One fire record, split between two sensors</h2>
     <div class="grid2">
       <div class="card">
-        <h3><span class="sw modis"></span>MODIS</h3>
-        <p>About 1 km pixels.</p>
+        <h3>MODIS</h3>
+        <p>About 1 km pixels. Two satellites: Terra and Aqua.</p>
       </div>
       <div class="card">
-        <h3><span class="sw viirs"></span>VIIRS (Suomi NPP)</h3>
-        <p>375 m pixels. Production ceased at 15:40 UTC on 2 Nov 2026 (FIRMS FAQ).</p>
+        <h3>VIIRS (Suomi NPP)</h3>
+        <p>375 m pixels. One satellite in this calendar. Production ceased at 15:40 UTC on 2 Nov 2026 (FIRMS FAQ).</p>
       </div>
     </div>
     <ul style="margin-top:28px">
@@ -168,8 +167,8 @@
         <div class="shot-missing" hidden>Screenshot of the calendar app</div>
       </div>
       <ul>
-        <li><span class="sw modis"></span>MODIS and <span class="sw viirs"></span>VIIRS daily counts, side by side, 2018–2020.</li>
-        <li>Region selector: <strong>R1</strong> central-eastern Mato Grosso and <strong>R2</strong> MATOPIBA, Brazil.</li>
+        <li>MODIS and VIIRS daily counts, side by side, 2018–2020.</li>
+        <li>Region selector: <strong>R1</strong> central-eastern Mato Grosso and <strong>R2</strong> part of MATOPIBA, Brazil.</li>
         <li>Monthly VIIRS/MODIS ratio, labelled <strong>“naive diagnostic, not harmonization”</strong>.</li>
         <li>Legend: <strong>“no detection recorded ≠ no fire”</strong>.</li>
         <li>Static web page; no login.</li>
@@ -183,14 +182,16 @@
 <section class="slide" id="s4" aria-label="Slide 4 of 7: finding">
   <div class="inner">
     <p class="kicker">What the calendar reveals · R1, central-eastern Mato Grosso</p>
-    <h2>The gap between sensors changes with the season</h2>
+    <h2 class="long">A first step toward harmonization: measuring the seasonal gap any harmonization must correct</h2>
     <div class="grid2">
       <div>
         <div class="big">3.2–3.6×</div>
         <p class="bigcap">as many VIIRS as MODIS detections over a full year (2018–2020)</p>
-        <div style="height:28px"></div>
+        <div style="height:20px"></div>
         <div class="big modis">9 months</div>
-        <p class="bigcap">where MODIS records clearly more than VIIRS (ratio below 0.8): February–April of 2018, 2019 and 2020</p>
+        <p class="bigcap">where MODIS records clearly more (ratio below 0.8): February–April of 2018, 2019 and 2020. Unexpected; still to be verified.</p>
+        <p class="note"><strong>Same timing:</strong> both sensors peak in September every year, in both regions.</p>
+        <p class="note"><strong>No single scaling factor</strong> fits every month in these data. MODIS here is Terra + Aqua; VIIRS is S-NPP only.</p>
       </div>
       <div class="card">
         <div class="bars" role="img" aria-label="VIIRS/MODIS ratio. Annual: 3.18, 3.33, 3.57. February to April, all below 1: 2018 0.58, 0.50, 0.35; 2019 0.70, 0.21, 0.43; 2020 0.39, 0.22, 0.62.">
@@ -209,11 +210,10 @@
           <span class="lab">Mar</span><div class="track"><div class="bar low" style="--v:0.22"><span>0.22</span></div></div>
           <span class="lab">Apr</span><div class="track"><div class="bar low" style="--v:0.62"><span>0.62</span></div></div>
         </div>
-        <p class="legend">VIIRS/MODIS ratio of detection counts. Dashed line = 1 (equal counts). Naive diagnostic, not harmonization.</p>
+        <p class="legend">VIIRS/MODIS ratio of detection counts. Blue: VIIRS higher. Red: MODIS higher. Dashed line = 1 (equal counts). Naive diagnostic, not harmonization.</p>
       </div>
     </div>
-    <p style="margin-top:24px">No single scaling factor turns one record into the other. Pixel size, overpass time and the number of satellites can all produce gaps like these; this view shows them but does not correct for them.</p>
-  </div>
+      </div>
   <div class="foot"><span>© 2026 Hemerton Silva</span><span>4 / 7</span></div>
 </section>
 
@@ -224,13 +224,13 @@
     <h2>NASA FIRMS, standard yearly country files</h2>
     <div class="grid2">
       <ul>
-        <li>Brazil, 2018–2020. <strong>MODIS version 6.03</strong> and <strong>VIIRS S-NPP version 2</strong>, as labelled in the files.</li>
+        <li>Brazil, 2018–2020. <strong>MODIS version 6.03</strong> (Terra + Aqua) and <strong>VIIRS S-NPP version 2</strong>, as labelled in the files.</li>
         <li>Kept <code>type == 0</code> (presumed vegetation fire), day and night, dates in UTC.</li>
         <li>Half-open boxes: R1 lon [−56, −52) × lat [−17, −10); R2 lon [−47, −43) × lat [−12, −5).</li>
         <li>Raw files are not redistributed; checksums are recorded with the aggregated data.</li>
       </ul>
       <div class="card">
-        <p style="margin-top:0">We acknowledge the use of imagery from the NASA LANCE FIRMS (<a href="https://www.earthdata.nasa.gov/data/tools/firms">earthdata.nasa.gov/data/tools/firms</a>).</p>
+        <p style="margin-top:0;font-size:clamp(14px,1.6vw,18px)">We acknowledge the use of data and/or imagery from NASA's Fire Information for Resource Management System (FIRMS) (<a href="https://earthdata.nasa.gov/firms">https://earthdata.nasa.gov/firms</a>), part of NASA's Land, Atmosphere Near real-time Capability for Earth observations (LANCE) (<a href="https://earthdata.nasa.gov/lance">https://earthdata.nasa.gov/lance</a>) and NASA's Earth Science Data and Information System (ESDIS).</p>
         <p class="meta" style="margin-bottom:0">Data accessed on 15 Nov 2026.</p>
       </div>
     </div>
@@ -238,34 +238,52 @@
   <div class="foot"><span>© 2026 Hemerton Silva</span><span>5 / 7</span></div>
 </section>
 
-<!-- 6. Method and next step -->
-<section class="slide" id="s6" aria-label="Slide 6 of 7: method and next step">
+<!-- 6. Method, next step and limits -->
+<section class="slide" id="s6" aria-label="Slide 6 of 7: method, next step and limits">
   <div class="inner">
-    <p class="kicker">Method and next step</p>
+    <p class="kicker">Next step and limits</p>
     <h2>From raw counts to a rate per observed area</h2>
     <div class="formula">Y = 1000 · ΣD / E &nbsp;<small>with E = Σ A<sub style="font-size:.7em">p</sub> &gt; 0</small></div>
-    <ul>
-      <li><strong>D</strong>: detections counted on the area both sensors could observe at each comparable overpass <em>p</em>.</li>
-      <li><strong>E</strong>: exposure, the usable observed area summed over overpasses (km² × overpass).</li>
-      <li>An observed zero (Y = 0) and a missing rate (E = 0) are different results.</li>
-      <li>Needs cloud and coverage information that the FIRMS files do not provide. Described as method; not computed in this submission.</li>
-    </ul>
+    <div class="grid2">
+      <ul>
+        <li><strong>E</strong>: the usable area both sensors observed on comparable overpasses (km² × overpass). <strong>D</strong>: detections counted on that same area.</li>
+        <li>An observed zero (Y = 0) and a missing rate (E = 0) are different results.</li>
+        <li>Needs cloud and coverage information that the FIRMS files do not provide. Method only; not computed here.</li>
+      </ul>
+      <div class="card">
+        <h3>Limits</h3>
+        <p style="margin:0;font-size:clamp(14px,1.6vw,18px)">Not harmonized: raw counts, and the ratio is a naive diagnostic. A detection is not a fire, nor burned area (pixels about 1 km vs 375 m). No cloud or coverage information: no detection recorded ≠ no fire. Two regions in Brazil, 2018–2020. No causal claims; not an operational alert or forecast.</p>
+      </div>
+    </div>
   </div>
   <div class="foot"><span>© 2026 Hemerton Silva</span><span>6 / 7</span></div>
 </section>
 
-<!-- 7. Limits -->
-<section class="slide" id="s7" aria-label="Slide 7 of 7: limits">
+<!-- 7. Who could use this / how it scales -->
+<section class="slide" id="s7" aria-label="Slide 7 of 7: who could use this and how it scales">
   <div class="inner">
-    <p class="kicker">Limits</p>
-    <h2>What this calendar does not claim</h2>
-    <ul>
-      <li><strong>Not harmonized.</strong> Raw counts; the ratio is a naive diagnostic, not a calibrated series.</li>
-      <li><strong>A detection is not a fire, and not burned area.</strong> Pixels differ: about 1 km (MODIS) and 375 m (VIIRS).</li>
-      <li><strong>No coverage information.</strong> FIRMS files carry no cloud-cover or missing-data information: no detection recorded ≠ no fire.</li>
-      <li><strong>Limited scope.</strong> Two regions in Brazil, 2018–2020.</li>
-      <li><strong>No causal claims.</strong> Not an operational alert, forecast or burned-area product.</li>
-    </ul>
+    <p class="kicker">Who could use this · how it scales</p>
+    <h2>Check the sensor before comparing periods</h2>
+    <div class="grid2">
+      <div class="card">
+        <h3>Who could use this</h3>
+        <ul>
+          <li>Early-warning analysts</li>
+          <li>Response teams</li>
+          <li>Land managers</li>
+          <li>Researchers</li>
+        </ul>
+        <p style="margin:12px 0 0;font-size:clamp(14px,1.6vw,18px)">To see whether a difference between periods comes from the ground or from the change of sensor.</p>
+      </div>
+      <div class="card">
+        <h3>How it scales</h3>
+        <ul>
+          <li>Same pipeline for any area of interest and any year in the FIRMS country files.</li>
+          <li>VIIRS continuity after Suomi NPP: NOAA-20 and NOAA-21.</li>
+          <li>Next: the rate per observed area, so periods compare on equal footing.</li>
+        </ul>
+      </div>
+    </div>
   </div>
   <div class="foot"><span>© 2026 Hemerton Silva</span><span>7 / 7</span></div>
 </section>

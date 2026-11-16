@@ -17,14 +17,14 @@ Two NASA sensor families record active fires over the same ground: MODIS (about 
 
 Brasa Orbit puts both records in the same day × month × year calendar for an area of interest. The reader can see where the two sensors agree, where they differ, and why a raw comparison is not yet a harmonized series.
 
-Two widely used services show the split: INPE uses a single "reference satellite" (Aqua since 22 Aug 2011), and GWIS shows VIIRS and MODIS anomalies separately. Brasa Orbit shows the overlap between the sensors directly, as the starting point for a bridge between them.
+Two widely used services show the split: INPE uses a single "reference satellite" (Aqua since 22 Aug 2011), and GWIS shows VIIRS and MODIS anomalies separately. Brasa Orbit shows both records for the same area and days. It is a first step toward harmonization: measuring the seasonal gap any harmonization must correct.
 
 ## What it shows
 
 - Daily counts of FIRMS detections for MODIS and VIIRS S-NPP, side by side, for 2018–2020, browsable by day, month and year.
 - A region selector:
   - **R1 — central-eastern Mato Grosso, Brazil:** lon [−56, −52) × lat [−17, −10).
-  - **R2 — MATOPIBA, Brazil (comparison):** lon [−47, −43) × lat [−12, −5).
+  - **R2 — part of MATOPIBA (Cerrado agricultural frontier), Brazil (comparison):** lon [−47, −43) × lat [−12, −5).
   - Boxes are half-open: a detection at exactly lon −52 is not in R1.
 - A VIIRS/MODIS ratio labelled **"naive diagnostic, not harmonization"**.
 - A legend that reads **"no detection recorded ≠ no fire"**: FIRMS files carry no information on cloud cover or missing observations.
@@ -40,7 +40,9 @@ Two widely used services show the split: INPE uses a single "reference satellite
 | R2 | 2019 | 36,290 | 157,356 | 4.34 |
 | R2 | 2020 | 32,782 | 144,100 | 4.40 |
 
-Detections with `type == 0`, day and night, dates in UTC. Both regions peak in September in all three years.
+Detections with `type == 0`, day and night, dates in UTC. MODIS counts include both Terra and Aqua; VIIRS here is Suomi NPP only.
+
+**The two sensors agree on timing.** September is the peak month in every year, in both regions, for both sensors.
 
 In R1, over a full year, VIIRS records 3.2–3.6× as many detections as MODIS. Yet in 9 months MODIS records clearly more than VIIRS (ratio below 0.8: February–April of 2018, 2019 and 2020):
 
@@ -50,7 +52,9 @@ In R1, over a full year, VIIRS records 3.2–3.6× as many detections as MODIS. 
 | 2019 | 0.70 | 0.21 | 0.43 |
 | 2020 | 0.39 | 0.22 | 0.62 |
 
-The ratio between the two records changes with the season, so no single scaling factor turns one record into the other. Pixel size, overpass time and the number of satellites can all produce gaps like these; this view shows them but does not correct for them.
+In R2, the ratio drops below 0.8 in March of each year (0.51 / 0.78 / 0.78 for 2018 / 2019 / 2020).
+
+The ratio between the two records changes with the season. In these data, no single scaling factor fits every month. The February–April inversion is unexpected and still to be verified. Pixel size, overpass time and the number of satellites can all produce gaps like these; this view shows them but does not correct for them.
 
 ## Data (NASA FIRMS)
 
@@ -59,7 +63,7 @@ The ratio between the two records changes with the season, so no single scaling 
   - VIIRS S-NPP (375 m): version 2, as labelled in the files.
 - **URL pattern:** `https://firms.modaps.eosdis.nasa.gov/data/country/{modis|viirs-snpp}/{YEAR}/{modis|viirs-snpp}_{YEAR}_Brazil.csv`
 - **Accessed:** 15 Nov 2026. File sizes and SHA-256 checksums are recorded in `docs/data/firms_daily_2018_2020.json` (`_meta.inputs`).
-- **Not in this repository:** the raw CSV files. `scripts/build_data.py` rebuilds the aggregated JSON from them.
+- **Not in this repository:** the raw CSV files. [scripts/build_data.py](scripts/build_data.py) rebuilds the aggregated JSON from them.
 - **Suomi NPP status:** according to the FIRMS FAQ, S-NPP production "ceased at 15:40 UTC on November 2, 2026". The 2018–2020 period used here is not affected.
 
 ## Method
@@ -103,8 +107,10 @@ This project draws on prior independent feasibility research (private), not incl
 
 ## License
 
-Apache License 2.0 — © 2026 Hemerton Silva (see `LICENSE`).
+Apache License 2.0 — © 2026 Hemerton Silva (see [LICENSE](LICENSE)).
 
 ## Acknowledgment
 
-We acknowledge the use of imagery from the NASA LANCE FIRMS (https://www.earthdata.nasa.gov/data/tools/firms). Data accessed on 15 Nov 2026.
+We acknowledge the use of data and/or imagery from NASA's Fire Information for Resource Management System (FIRMS) (https://earthdata.nasa.gov/firms), part of NASA's Land, Atmosphere Near real-time Capability for Earth observations (LANCE) (https://earthdata.nasa.gov/lance) and NASA's Earth Science Data and Information System (ESDIS).
+
+Data accessed on 15 Nov 2026.
