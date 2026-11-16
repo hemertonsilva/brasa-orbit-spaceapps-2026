@@ -149,7 +149,7 @@
     var inv = [];
     state.years.forEach(function (y) {
       mon[y].forEach(function (c, i) {
-        if (c.modis > 0 && roundRatio(c.viirs / c.modis) < 0.8) inv.push(MONTHS[i] + " " + y);
+        if (c.modis > 0 && c.viirs / c.modis < 0.8) inv.push(MONTHS[i] + " " + y);
       });
     });
     var p = document.getElementById("finding");
@@ -183,7 +183,7 @@
     txt += inv.length
       ? "But the size of the gap is not constant: in " + inv.length + " month" + (inv.length > 1 ? "s" : "") +
         " MODIS records clearly more than VIIRS (ratio below 0.8: " + inv.join(", ") +
-        "), so no single scaling factor converts one record into the other. This inversion is unexpected and still to be verified; " +
+        "), so in these data no single scaling factor fits every month. This inversion is unexpected and still to be verified; " +
         "pixel size, overpass time and the number of satellites (MODIS on Terra and Aqua, VIIRS on Suomi NPP only) can all produce gaps like these. " +
         "This view shows them but does not correct for them."
       : "No month in this period has MODIS recording clearly more than VIIRS (ratio below 0.8).";
@@ -203,9 +203,10 @@
           cell.textContent = "n/a";
           cell.classList.add("na");
         } else {
-          var r = roundRatio(c.viirs / c.modis);
+          var r = c.viirs / c.modis;
           cell.classList.add(rbinOf(r));
-          cell.textContent = (r < 10 ? fmt1.format(r) : fmt.format(r)) + "×";
+          cell.appendChild(document.createTextNode(fmt2.format(r)));
+          cell.appendChild(el("span", "x", "×"));
         }
         cell.dataset.tip = MONTHS[i] + " " + y + "|" + c.modis + "|" + c.viirs;
         grid.appendChild(cell);

@@ -39,7 +39,7 @@ REGIONS = {
         "lat": [-17.0, -10.0],
     },
     "R2": {
-        "name": "MATOPIBA (Cerrado agricultural frontier)",
+        "name": "Part of MATOPIBA (Cerrado agricultural frontier)",
         "lon": [-47.0, -43.0],
         "lat": [-12.0, -5.0],
     },
@@ -87,7 +87,7 @@ def main(raw_dir: Path, out_path: Path) -> None:
             "title": "Brasa Orbit - daily active-fire detections, MODIS vs VIIRS S-NPP",
             "source": "NASA FIRMS standard (archive) yearly country files, Brazil",
             "source_url": "https://firms.modaps.eosdis.nasa.gov/data/country/",
-            "acknowledgment": "We acknowledge the use of imagery from the NASA LANCE FIRMS (https://www.earthdata.nasa.gov/data/tools/firms).",
+            "acknowledgment": "We acknowledge the use of data and/or imagery from NASA's Fire Information for Resource Management System (FIRMS) (https://earthdata.nasa.gov/firms), part of NASA's Land, Atmosphere Near real-time Capability for Earth observations (LANCE) (https://earthdata.nasa.gov/lance) and NASA's Earth Science Data and Information System (ESDIS).",
             "versions_as_labelled_in_files": {s: sorted(v) for s, v in versions.items()},
             "filter": "type == 0 (presumed vegetation fire); all confidence levels; day and night",
             "date_basis": "acq_date (UTC) as published by FIRMS",

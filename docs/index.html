@@ -35,7 +35,7 @@
   <section class="legend" aria-label="Color legend for the daily calendars">
     <span class="legend-title">Daily calendars · detections per day</span>
     <ul id="legend" class="legend-scale"></ul>
-    <p class="legend-note">Same scale for both sensors. An outlined, unfilled cell means <strong>no detection recorded</strong> — not “no fire”: the files carry no cloud or coverage information.</p>
+    <p class="legend-note">Same scale for both sensors. An outlined, unfilled cell means <strong>no detection recorded</strong> — not “no fire”: the files carry no cloud or coverage information. On small screens, tap a cell or use the table view below.</p>
   </section>
 
   <section id="calendars" class="calendars" aria-label="Daily calendars by year"></section>
@@ -53,7 +53,7 @@
 
   <section class="next" aria-labelledby="next-title">
     <h2 id="next-title">Next step: compare what was actually observed</h2>
-    <p>Counting detections is not enough to compare sensors: a month can look quiet because of clouds or fewer overpasses, not less fire. The method proposed for Brasa Orbit normalizes detections by the area each sensor could actually observe:</p>
+    <p>Counting detections is not enough to compare sensors: a month can look quiet because of clouds or fewer overpasses, not less fire. The method proposed for Brasa Orbit normalizes detections by the usable area both sensors observed on comparable overpasses:</p>
     <p class="formula"><span>Y = 1,000 × ΣD / E</span></p>
     <p>where <em>D</em> are detections inside the common usable footprint of comparable overpasses and <em>E</em> is the exposure — the observable area accumulated over those overpasses (km² · pass). Months without usable exposure get no rate instead of a false zero. This requires swath-level coverage data and is <strong>not implemented in this prototype</strong>.</p>
   </section>
@@ -64,7 +64,7 @@
       <li>Each count is a NASA FIRMS active-fire <strong>detection</strong> (a pixel flagged with one or more fires or thermal anomalies), filtered to <code>type = 0</code> (presumed vegetation fire). It is not a count of fires and not burned area.</li>
       <li>MODIS pixels are about 1 km; VIIRS I-band pixels are 375 m, and the satellites pass at different times. Raw counts from the two sensors are <strong>not directly comparable</strong>; this view does not harmonize them.</li>
       <li>Dates are the acquisition date in UTC as published by FIRMS. Data: FIRMS standard (archive) yearly country files for Brazil — MODIS version 6.03 and VIIRS S-NPP version 2, as labelled in the files.</li>
-      <li>We acknowledge the use of imagery from the NASA LANCE FIRMS (<a href="https://www.earthdata.nasa.gov/data/tools/firms">earthdata.nasa.gov/data/tools/firms</a>).</li>
+      <li>We acknowledge the use of data and/or imagery from NASA's Fire Information for Resource Management System (FIRMS) (<a href="https://earthdata.nasa.gov/firms">https://earthdata.nasa.gov/firms</a>), part of NASA's Land, Atmosphere Near real-time Capability for Earth observations (LANCE) (<a href="https://earthdata.nasa.gov/lance">https://earthdata.nasa.gov/lance</a>) and NASA's Earth Science Data and Information System (ESDIS).</li>
       <li>Built during the hackathon window (14–15 Nov 2026). Code, data pipeline and method notes: <a href="https://github.com/hemertonsilva/brasa-orbit-spaceapps-2026">github.com/hemertonsilva/brasa-orbit-spaceapps-2026</a>.</li>
     </ul>
     <p class="signature">© 2026 Hemerton Silva · Team Brasa Orbital · Code released under the Apache License 2.0.</p>
